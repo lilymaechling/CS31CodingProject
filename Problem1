@@ -3,7 +3,8 @@
 def max_num_guess(a):
     n = len(a)
     g = [[0 for i in range(n)] for j in range(n)]
-    Alice =[]
+    recovery = [[0 for i in range(n)] for j in range(n)] # used for recovery
+    alice = None
     for i in range(n):
         g[i][i] = 0
 
@@ -16,24 +17,30 @@ def max_num_guess(a):
                 # Base Case of 2 elements
                 if c-r == 1:
                     g[r][c] = max(a[r], a[c])
+                    alice = max(a[r], a[c])
                 # Only Valid Arrays have an even number of elements
                 elif (c-r) % 2 != 0:
                     # Check W options based on Bob's best move
                     if a[r+1] >= a[c]:
                         first = g[r+2][c]
+                        recovery[r+2][c] = 1
                     else:
                         first = g[r+1][c-1]
+                        recovery[r+1][c-1] = 1
                     if a[r] >= a[c-1]:
                         second = g[r+1][c-1]
+                        recovery[r+1][c-1] = 1
                     else:
                         second = g[r][c-2]
+                        recovery[r][c-2] = 1
                     # Assign the weight according to recurrence
                     g[r][c] = max(first + a[r], second + a[c])
-    print(g)
-    # Recovery Solution
-    Alice = list()
-
-    return g[0][n-1]  # Alice's max weight
+                    if r == 0 and c == n-1:
+                        if first + a[r] >= second + a[c]:
+                            alice = a[r]
+                        else:
+                            alice= a[c]
+    return [g[0][n-1], alice]  # Alice's max weight
 
 
 a = [2,3,8,5]  # Expected: 10
@@ -42,4 +49,36 @@ c = [1,4,0,2,12,-6]  # Expected: 13
 d2 = [12,13,65,32,6,23]  # Expected: 94 Alice[23,6,65]
 d3 = [5,12,13,65,32,6]  # Expected: 83 Alice[6,65,12] Bob[32,13,5]
 d = [5,12,13,65,32,6,23,33]  # Expected: 116 Alice[33,6,65,12]  Bob[23,32,13,5]
-print(max_num_guess(d))
+e = [1,-100,0,-200,20,5]  # Expected: 21 Alice[1, 20, 0]
+#print(max_num_guess(a))
+
+
+def number_game(a):
+    print("Welcome to the number picking game. You are player 2, Bob. Please wait to select your number.")
+    print("The numbers in play are ", a)
+    alice_total = 0
+    bob_total = 0
+    while len(a)>0:
+        alice_pick = max_num_guess(a)[1]
+        print("Alice picked: ", alice_pick)
+        alice_total += int(alice_pick)
+        if alice_pick == a[0]:
+            a = a[1:]
+        elif alice_pick == a[len(a)-1]:
+            a = a[:len(a)-1]
+        print("The remaining numbers are ", a)
+        bob_pick = input("Choose your number: ")
+        print("Bob picked ", bob_pick)
+        bob_total += int(bob_pick)
+        if int(bob_pick) == a[0]:
+            a = a[1:]
+        elif int(bob_pick) == a[len(a) - 1]:
+            a = a[:len(a) - 1]
+        else:
+            print("Invalid pick. Read the rules. Ending game.")
+            break
+    print("Game over.")
+    print("Alice totaled: ", alice_total)
+    print("Bob totaled: ", bob_total)
+
+number_game(d)
