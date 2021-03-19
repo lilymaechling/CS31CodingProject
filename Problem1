@@ -21,18 +21,46 @@ def max_num_guess(a):
                 # Only Valid Arrays have an even number of elements
                 elif (c-r) % 2 != 0:
                     # Check W options based on Bob's best move
-                    if a[r+1] >= a[c]:
+                    if a[r+1] > a[c]:
                         first = g[r+2][c]
                         recovery[r+2][c] = 1
-                    else:
+                    elif a[r+1] < a[c]:
                         first = g[r+1][c-1]
                         recovery[r+1][c-1] = 1
-                    if a[r] >= a[c-1]:
+                    # Means the numbers are equal
+                    else:
+                        # Compare the exposed number
+                        start = r+2
+                        end = c-1
+                        if a[start] == a[end]: # all the numbers are the same
+                            first = g[r + 2][c]
+                            recovery[r + 2][c] = 1
+                        elif a[start] > a[end]:
+                            first = g[r + 1][c - 1]
+                            recovery[r + 1][c - 1] = 1
+                        else:
+                            first = g[r + 2][c]
+                            recovery[r + 2][c] = 1
+                    if a[r] > a[c-1]:
                         second = g[r+1][c-1]
                         recovery[r+1][c-1] = 1
-                    else:
+                    elif a[r] < a[c-1]:
                         second = g[r][c-2]
                         recovery[r][c-2] = 1
+                    # Means the numbers are equal
+                    else:
+                        # Compare the exposed number
+                        start = r+1
+                        end = c-2
+                        if a[start] == a[end]: # all the numbers are the same
+                            second = g[r + 1][c - 1]
+                            recovery[r + 1][c - 1] = 1
+                        elif a[start] > a[end]:
+                            second = g[r][c - 2]
+                            recovery[r][c - 2] = 1
+                        else:
+                            second = g[r + 1][c - 1]
+                            recovery[r + 1][c - 1] = 1
                     # Assign the weight according to recurrence
                     g[r][c] = max(first + a[r], second + a[c])
                     if r == 0 and c == n-1:
@@ -50,7 +78,8 @@ d2 = [12,13,65,32,6,23]  # Expected: 94 Alice[23,6,65]
 d3 = [5,12,13,65,32,6]  # Expected: 83 Alice[6,65,12] Bob[32,13,5]
 d = [5,12,13,65,32,6,23,33]  # Expected: 116 Alice[33,6,65,12]  Bob[23,32,13,5]
 e = [1,-100,0,-200,20,5]  # Expected: 21 Alice[1, 20, 0]
-#print(max_num_guess(a))
+f = [0,0,3,6,0,0] # Expected: 6
+#print(max_num_guess(f))
 
 
 def number_game(a):
@@ -81,4 +110,4 @@ def number_game(a):
     print("Alice totaled: ", alice_total)
     print("Bob totaled: ", bob_total)
 
-number_game(d)
+number_game(f)
