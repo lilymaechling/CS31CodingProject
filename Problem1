@@ -1,0 +1,45 @@
+# input: an array of numbers for the game
+# output: min W for Alice
+def max_num_guess(a):
+    n = len(a)
+    g = [[0 for i in range(n)] for j in range(n)]
+    Alice =[]
+    for i in range(n):
+        g[i][i] = 0
+
+    # Loop through diagonally
+    for col in range(1,n):
+        for row in range(n):
+            if col+row < n :
+                r = row
+                c = col + row
+                # Base Case of 2 elements
+                if c-r == 1:
+                    g[r][c] = max(a[r], a[c])
+                # Only Valid Arrays have an even number of elements
+                elif (c-r) % 2 != 0:
+                    # Check W options based on Bob's best move
+                    if a[r+1] >= a[c]:
+                        first = g[r+2][c]
+                    else:
+                        first = g[r+1][c-1]
+                    if a[r] >= a[c-1]:
+                        second = g[r+1][c-1]
+                    else:
+                        second = g[r][c-2]
+                    # Assign the weight according to recurrence
+                    g[r][c] = max(first + a[r], second + a[c])
+    print(g)
+    # Recovery Solution
+    Alice = list()
+
+    return g[0][n-1]  # Alice's max weight
+
+
+a = [2,3,8,5]  # Expected: 10
+b = [4,0,2,12]  # Expected: 14
+c = [1,4,0,2,12,-6]  # Expected: 13
+d2 = [12,13,65,32,6,23]  # Expected: 94 Alice[23,6,65]
+d3 = [5,12,13,65,32,6]  # Expected: 83 Alice[6,65,12] Bob[32,13,5]
+d = [5,12,13,65,32,6,23,33]  # Expected: 116 Alice[33,6,65,12]  Bob[23,32,13,5]
+print(max_num_guess(d))
